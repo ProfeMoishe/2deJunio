@@ -166,6 +166,42 @@ button:active { transform: scale(0.98); }
     box-shadow: 0 0 35px #00ff88;
 }
 
+/* Estilos para grabación de audio */
+.recording-status {
+    display: none;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid rgba(255, 0, 0, 0.5);
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.recording-status.active {
+    display: block;
+    animation: recordingPulse 1s infinite;
+}
+
+@keyframes recordingPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.audio-playback {
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.audio-playback audio {
+    width: 100%;
+    margin: 10px 0;
+}
+
+    
 /* Responsive: en móvil el contenedor ocupa más ancho y se separa del borde */
 @media (max-width: 600px) {
     body {
@@ -219,6 +255,12 @@ button:active { transform: scale(0.98); }
         <p id="aiMessage">Hola humano... estoy observando tu energía digital.</p>
         <button onclick="speakAura()">Hablar con AURA</button>
         <button onclick="startVoice()">Activar voz</button>
+        <button onclick="startVoice()">Activar grabación</button>
+        <div class="recording-status" id="recordingStatus">🔴 Grabando...</div>
+        <div class="audio-playback" id="audioPlayback" style="display: none;">
+            <p>Tu grabación:</p>
+            <audio id="audioElement" controls></audio>
+        </div>
     </div>
 
     <h2>Modo Matrix</h2>
@@ -249,6 +291,11 @@ let seconds = 0;
 let lastMoveTime = 0;
 const MOVE_THROTTLE_MS = 100;
 
+// Variables para grabación de audio
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+    
 // =============================================
 // MEMORIA LOCAL
 // =============================================
@@ -338,6 +385,75 @@ function speakAura() {
     const voice = new SpeechSynthesisUtterance(randomMessage);
     voice.lang = "es-ES";
     speechSynthesis.speak(voice);
+}
+
+// =============================================
+// GRABACIÓN DE AUDIO
+// =============================================
+async function startVoice() {
+    if (isRecording) {
+        // Detener grabación
+        stopRecording();
+        return;
+    }
+
+    try {
+        // Solicitar permiso para usar el micrófono
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        // Crear MediaRecorder
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        isRecording = true;
+
+        // Mostrar estado de grabación
+        document.getElementById("recordingStatus").classList.add("active");
+
+        // Recopilar datos de audio
+        mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+        };
+
+        // Cuando finalice la grabación
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            // Mostrar reproductor de audio
+            const audioElement = document.getElementById("audioElement");
+            audioElement.src = audioUrl;
+            document.getElementById("audioPlayback").style.display = "block";
+        };
+
+        mediaRecorder.start();
+        
+        // Cambiar texto del botón
+        const voiceBtn = document.querySelector("button[onclick='startVoice()']");
+        voiceBtn.innerText = "Detener grabación";
+        voiceBtn.style.background = "#ef4444";
+
+    } catch (error) {
+        console.error("Error al acceder al micrófono:", error);
+        alert("No se pudo acceder al micrófono. Por favor, verifica los permisos.");
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+
+        // Detener todos los tracks del stream
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+
+        // Ocultar estado de grabación
+        document.getElementById("recordingStatus").classList.remove("active");
+
+        // Restaurar botón
+        const voiceBtn = document.querySelector("button[onclick='startVoice()']");
+        voiceBtn.innerText = "Activar grabación";
+        voiceBtn.style.background = "#38bdf8";
+    }
 }
 
 // =============================================
