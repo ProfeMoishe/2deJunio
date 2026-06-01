@@ -4,200 +4,176 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AURA - Experiencia Inteligente</title>
-
 <style>
 /* =========================================
-RESET - Sin cambios
+RESET Y ESTILOS BASE
 ========================================= */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-body{
-    overflow:hidden;
-    min-height:100vh;
-    background:linear-gradient(135deg,#020617,#0f172a,#111827);
-    color:white;
-    transition:1s;
+html, body {
+    height: 100%;
+    width: 100%;
 }
 
-canvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:-1;
+body {
+    overflow: hidden;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #020617, #0f172a, #111827);
+    color: white;
+    transition: 1s;
+    position: relative;
 }
 
-.loader{
-    position:fixed;
-    inset:0;
-    background:black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:clamp(2rem,6vw,4rem);
-    z-index:9999;
-    animation:fadeOut 2s forwards;
-    animation-delay:2s;
+canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
 }
 
-@keyframes fadeOut{
-    to{
-        opacity:0;
-        visibility:hidden;
+.loader {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(2rem, 6vw, 4rem);
+    z-index: 9999;
+    animation: fadeOut 2s forwards;
+    animation-delay: 2s;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
     }
 }
 
-.container{
-    position:relative;
-    width:min(92%,950px);
-    margin:auto;
-    top:50%;
-    transform:translateY(-50%);
-    padding:clamp(20px,4vw,40px);
-    border-radius:30px;
-    backdrop-filter:blur(15px);
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.15);
-    box-shadow:0 0 40px rgba(255,255,255,0.08);
-    text-align:center;
+.container {
+    position: relative;
+    width: min(92%, 950px);
+    margin: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: clamp(20px, 4vw, 40px);
+    border-radius: 30px;
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 0 40px rgba(255,255,255,0.08);
+    text-align: center;
 }
 
-h1{
-    font-size:clamp(2.5rem,7vw,5rem);
-    margin-bottom:15px;
+h1 { font-size: clamp(2.5rem, 7vw, 5rem); margin-bottom: 15px; }
+h2 { margin-top: 25px; margin-bottom: 10px; font-size: clamp(1.2rem, 3vw, 2rem); }
+p { color: #d1d5db; margin-bottom: 20px; line-height: 1.6; }
+
+input, select, button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 15px;
+    font-size: 1rem;
 }
 
-h2{
-    margin-top:25px;
-    margin-bottom:10px;
-    font-size:clamp(1.2rem,3vw,2rem);
+button {
+    cursor: pointer;
+    background: #38bdf8;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+button:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(56,189,248,0.5); }
+button:active { transform: scale(0.97); }
+
+.mode-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 12px;
+    margin-top: 15px;
 }
 
-p{
-    color:#d1d5db;
-    margin-bottom:20px;
-    line-height:1.6;
+.particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFade 1s linear forwards;
+}
+@keyframes particleFade {
+    to { transform: translateY(-25px) scale(0); opacity: 0; }
 }
 
-input, select, button{
-    width:100%;
-    padding:15px;
-    margin:10px 0;
-    border:none;
-    border-radius:15px;
-    font-size:1rem;
+.aura-ai {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    animation: aiGlow 4s infinite alternate;
+}
+@keyframes aiGlow {
+    from { box-shadow: 0 0 10px rgba(0,255,255,0.2); }
+    to { box-shadow: 0 0 30px rgba(0,255,255,0.6); }
 }
 
-button{
-    cursor:pointer;
-    background:#38bdf8;
-    color:white;
-    font-weight:bold;
-    transition:0.3s;
+.stats {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 15px;
+}
+.stats p {
+    background: rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 15px;
+    font-weight: bold;
 }
 
-button:hover{
-    transform:scale(1.04);
-    box-shadow:0 0 20px rgba(56,189,248,0.5);
+.cyberpunk {
+    background: black !important;
+    color: #00ffee;
+}
+.cyberpunk .container {
+    border: 1px solid #00ffee;
+    box-shadow: 0 0 35px #00ffee;
 }
 
-button:active{
-    transform:scale(0.97);
+.matrix-mode {
+    background: black !important;
+    color: #00ff88;
+}
+.matrix-mode .container {
+    border: 1px solid #00ff88;
+    box-shadow: 0 0 35px #00ff88;
 }
 
-.mode-buttons{
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
-    gap:12px;
-    margin-top:15px;
+@media(max-width: 900px) { .container { width: 94%; } }
+@media(max-width: 600px) {
+    body { overflow: auto; }
+    .container { top: auto; transform: none; margin: 40px auto; border-radius: 22px; padding: 20px; }
+    .mode-buttons { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    input, button { padding: 16px; font-size: 1rem; }
 }
-
-.particle{
-    position:fixed;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    pointer-events:none;
-    animation:particleFade 1s linear forwards;
-}
-
-@keyframes particleFade{
-    to{
-        transform: translateY(-25px) scale(0);
-        opacity:0;
-    }
-}
-
-.aura-ai{
-    margin-top:25px;
-    padding:20px;
-    border-radius:20px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.12);
-    backdrop-filter:blur(10px);
-    animation:aiGlow 4s infinite alternate;
-}
-
-@keyframes aiGlow{
-    from{ box-shadow:0 0 10px rgba(0,255,255,0.2); }
-    to{ box-shadow:0 0 30px rgba(0,255,255,0.6); }
-}
-
-.stats{
-    margin-top:20px;
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-    gap:15px;
-}
-
-.stats p{
-    background:rgba(255,255,255,0.08);
-    padding:15px;
-    border-radius:15px;
-    font-weight:bold;
-}
-
-.cyberpunk{
-    background:black !important;
-    color:#00ffee;
-}
-.cyberpunk .container{
-    border:1px solid #00ffee;
-    box-shadow:0 0 35px #00ffee;
-}
-
-.matrix-mode{
-    background:black !important;
-    color:#00ff88;
-}
-.matrix-mode .container{
-    border:1px solid #00ff88;
-    box-shadow:0 0 35px #00ff88;
-}
-
-@media(max-width:900px){ .container{ width:94%; } }
-@media(max-width:600px){
-    body{ overflow:auto; }
-    .container{ top:auto; transform:none; margin:40px auto; border-radius:22px; padding:20px; }
-    .mode-buttons{ grid-template-columns:1fr; }
-    .stats{ grid-template-columns:1fr; }
-    input, button{ padding:16px; font-size:1rem; }
-}
-@media(max-width:380px){
-    h1{ font-size:2rem; }
-    p{ font-size:0.9rem; }
+@media(max-width: 380px) {
+    h1 { font-size: 2rem; }
+    p { font-size: 0.9rem; }
 }
 </style>
 </head>
 <body>
-
-<!-- CORRECCIÓN 1: Eliminado el elemento <audio> sin funcionalidad (no tenía src) -->
-<!-- Si se desea música, se puede agregar más adelante -->
 
 <div class="loader">AURA</div>
 <canvas id="bg"></canvas>
@@ -240,26 +216,34 @@ button:active{
 </div>
 
 <script>
-// =========================================
-// CORRECCIÓN 2: Se eliminó la duplicación completa del HTML.
-// Ahora solo hay un bloque <script> con toda la lógica.
-// =========================================
+// =============================================
+// VARIABLES GLOBALES (declaradas una sola vez)
+// =============================================
+let matrixActive = false;     // Controla el modo Matrix
+let matrixAnimation = null;   // ID de requestAnimationFrame del Matrix
+let starsAnimation = null;    // ID de la animación de estrellas
+let stars = [];               // Array de estrellas
+let clicks = 0;
+let moves = 0;
+let seconds = 0;
+let lastMoveTime = 0;
+const MOVE_THROTTLE_MS = 100;
 
-/* =========================================
-MEMORIA (sin cambios)
-========================================= */
+// =============================================
+// MEMORIA LOCAL
+// =============================================
 window.onload = () => {
     const savedName = localStorage.getItem("auraName");
     const savedColor = localStorage.getItem("auraColor");
-    if(savedName){
+    if (savedName) {
         document.getElementById("welcome").innerHTML = `Hola ${savedName}, preparé una experiencia diferente para vos.`;
     }
-    if(savedColor){
+    if (savedColor) {
         document.body.style.background = `linear-gradient(135deg, ${savedColor}, #000)`;
     }
-}
+};
 
-function saveData(){
+function saveData() {
     const name = document.getElementById("name").value;
     const color = document.getElementById("color").value;
     localStorage.setItem("auraName", name);
@@ -267,18 +251,17 @@ function saveData(){
     alert("Memoria guardada");
 }
 
-/* =========================================
-MODOS EMOCIONALES
-========================================= */
-function setMode(mode){
+// =============================================
+// MODOS EMOCIONALES (con corrección: si Matrix está activo, lo desactiva)
+// =============================================
+function setMode(mode) {
     const body = document.body;
     body.classList.remove("cyberpunk");
-    // CORRECCIÓN 3: Si el modo Matrix está activo, lo desactivamos para que se vea el color elegido.
-    // Evita conflictos visuales con la clase .matrix-mode que forza fondo negro.
-    if(matrixActive){
-        toggleMatrix();  // desactiva Matrix y reinicia estrellas
+    // Si el modo Matrix está activo, lo desactivamos para que se vea el color
+    if (matrixActive) {
+        toggleMatrix();  // esto desactiva Matrix y reinicia las estrellas
     }
-    switch(mode){
+    switch (mode) {
         case "feliz": body.style.background = "linear-gradient(135deg,#f59e0b,#facc15)"; break;
         case "tranquilo": body.style.background = "linear-gradient(135deg,#0ea5e9,#1e3a8a)"; break;
         case "motivado": body.style.background = "linear-gradient(135deg,#ef4444,#7f1d1d)"; break;
@@ -287,49 +270,45 @@ function setMode(mode){
     }
 }
 
-/* =========================================
-PARTÍCULAS (sin cambios, funciona bien)
-========================================= */
-document.addEventListener("mousemove", (e)=>{
+// =============================================
+// PARTÍCULAS AL MOVER EL MOUSE
+// =============================================
+document.addEventListener("mousemove", (e) => {
     const particle = document.createElement("div");
     particle.classList.add("particle");
     particle.style.left = e.clientX + "px";
     particle.style.top = e.clientY + "px";
-    particle.style.background = `hsl(${Math.random()*360}, 100%, 70%)`;
+    particle.style.background = `hsl(${Math.random() * 360}, 100%, 70%)`;
     document.body.appendChild(particle);
-    setTimeout(()=>{ particle.remove(); }, 1000);
+    setTimeout(() => particle.remove(), 1000);
 });
 
-/* =========================================
-MODO OCULTO (CORREGIDO)
-========================================= */
+// =============================================
+// MODO OCULTO (CYBERPUNK) - Teclado "aura"
+// =============================================
 let secret = [];
 let secretTimeout;
 
-document.addEventListener("keydown", (e)=>{
+document.addEventListener("keydown", (e) => {
     secret.push(e.key);
-    // CORRECCIÓN 4: Limitamos el array a las últimas 10 teclas para que no crezca infinitamente.
-    if(secret.length > 10) secret.shift();
-    
-    // Reiniciamos el temporizador de inactividad
+    if (secret.length > 10) secret.shift(); // Limitar tamaño
     clearTimeout(secretTimeout);
     secretTimeout = setTimeout(() => { secret = []; }, 3000);
-    
-    if(secret.join("").includes("aura")){
+    if (secret.join("").includes("aura")) {
         activateCyberpunk();
         secret = [];
         clearTimeout(secretTimeout);
     }
 });
 
-function activateCyberpunk(){
+function activateCyberpunk() {
     document.body.classList.add("cyberpunk");
     alert("Modo oculto activado");
 }
 
-/* =========================================
-IA FICTICIA (sin cambios)
-========================================= */
+// =============================================
+// IA AURA (texto y voz)
+// =============================================
 const auraMessages = [
     "Detecto creatividad en tu mente.",
     "Tu energía digital está aumentando.",
@@ -339,7 +318,7 @@ const auraMessages = [
     "Tu presencia altera el entorno."
 ];
 
-function speakAura(){
+function speakAura() {
     const randomMessage = auraMessages[Math.floor(Math.random() * auraMessages.length)];
     document.getElementById("aiMessage").innerText = randomMessage;
     const voice = new SpeechSynthesisUtterance(randomMessage);
@@ -347,20 +326,16 @@ function speakAura(){
     speechSynthesis.speak(voice);
 }
 
-/* =========================================
-MATRIX + FONDO ESTRELLAS (SOLUCIÓN CONFLICTO)
-========================================= */
-let matrixActive = false;
-let matrixAnimation;
-let starsAnimation;     // ID de la animación de estrellas
-let stars = [];
-
-// Inicializar estrellas una sola vez
+// =============================================
+// FONDO DE ESTRELLAS (normal)
+// =============================================
 function initStars() {
     const canvas = document.getElementById("bg");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     const count = 120;
     stars = [];
-    for(let i=0; i<count; i++){
+    for (let i = 0; i < count; i++) {
         stars.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -369,52 +344,51 @@ function initStars() {
     }
 }
 
-// Animación de estrellas (se ejecuta continuamente cuando Matrix está DESactivado)
 function animateStars() {
     const canvas = document.getElementById("bg");
     const ctx = canvas.getContext("2d");
-    if(!ctx) return;
-    // Limpia el canvas
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
-    for(let star of stars){
+    for (let star of stars) {
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
         star.y += 0.3;
-        if(star.y > canvas.height){
+        if (star.y > canvas.height) {
             star.y = 0;
             star.x = Math.random() * canvas.width;
         }
     }
-    if(!matrixActive){
+    if (!matrixActive) {
         starsAnimation = requestAnimationFrame(animateStars);
     }
 }
 
-// Animación Matrix (se ejecuta solo cuando está activa)
-function startMatrix(){
+// =============================================
+// MODO MATRIX (con gestión limpia de animaciones)
+// =============================================
+function startMatrix() {
     const canvas = document.getElementById("bg");
     const ctx = canvas.getContext("2d");
-    if(!ctx) return;
+    if (!ctx) return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = [];
-    for(let x = 0; x < columns; x++) drops[x] = 1;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(1);
     const letters = "アァカサタナハマヤャラワ0123456789";
     
-    function drawMatrix(){
-        if(!matrixActive) return; // salir si ya no está activo
+    function drawMatrix() {
+        if (!matrixActive) return;
         ctx.fillStyle = "rgba(0,0,0,0.08)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#00ff88";
         ctx.font = fontSize + "px monospace";
-        for(let i = 0; i < drops.length; i++){
+        for (let i = 0; i < drops.length; i++) {
             const text = letters[Math.floor(Math.random() * letters.length)];
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            if(drops[i] * fontSize > canvas.height && Math.random() > 0.975){
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                 drops[i] = 0;
             }
             drops[i]++;
@@ -424,51 +398,37 @@ function startMatrix(){
     drawMatrix();
 }
 
-function stopMatrix(){
-    if(matrixAnimation){
+function stopMatrix() {
+    if (matrixAnimation) {
         cancelAnimationFrame(matrixAnimation);
         matrixAnimation = null;
     }
 }
 
-function toggleMatrix(){
+function toggleMatrix() {
     matrixActive = !matrixActive;
     document.body.classList.toggle("matrix-mode");
-    
-    if(matrixActive){
-        // CORRECCIÓN 5: Detener la animación de estrellas y limpiar canvas
-        if(starsAnimation){
+    if (matrixActive) {
+        // Detener estrellas
+        if (starsAnimation) {
             cancelAnimationFrame(starsAnimation);
             starsAnimation = null;
         }
-        // Forzar redimension del canvas para matrix
-        const canvas = document.getElementById("bg");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        // Iniciar matrix
         startMatrix();
     } else {
-        // Detener matrix y reiniciar estrellas
         stopMatrix();
-        // Limpiar canvas completamente antes de reiniciar estrellas
+        // Limpiar canvas y reiniciar estrellas
         const canvas = document.getElementById("bg");
         const ctx = canvas.getContext("2d");
-        if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Reiniciar estrellas con nuevo tamaño de ventana
-        initStars();
-        animateStars();
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        initStars();          // reinicia posición de estrellas con el tamaño actual
+        animateStars();       // arranca de nuevo la animación de estrellas
     }
 }
 
-/* =========================================
-ESTADÍSTICAS (CORRECCIÓN: Throttle en movimientos)
-========================================= */
-let clicks = 0;
-let moves = 0;
-let seconds = 0;
-let lastMoveTime = 0;
-const MOVE_THROTTLE_MS = 100; // solo cuenta un movimiento cada 100ms
-
+// =============================================
+// ESTADÍSTICAS (con throttling de movimientos)
+// =============================================
 document.addEventListener("click", () => {
     clicks++;
     document.getElementById("clickCount").innerText = clicks;
@@ -476,7 +436,7 @@ document.addEventListener("click", () => {
 
 document.addEventListener("mousemove", () => {
     const now = Date.now();
-    if(now - lastMoveTime >= MOVE_THROTTLE_MS){
+    if (now - lastMoveTime >= MOVE_THROTTLE_MS) {
         moves++;
         document.getElementById("moveCount").innerText = moves;
         lastMoveTime = now;
@@ -488,99 +448,76 @@ setInterval(() => {
     document.getElementById("timeCount").innerText = seconds;
 }, 1000);
 
-/* =========================================
-DÍA / NOCHE (sin cambios)
-========================================= */
-function autoTheme(){
+// =============================================
+// DÍA / NOCHE AUTOMÁTICO
+// =============================================
+function autoTheme() {
     const hour = new Date().getHours();
     const timeText = document.getElementById("timeMode");
-    if(hour >= 6 && hour < 18){
-        timeText.innerText = "Modo día activado";
-    }else{
-        timeText.innerText = "Modo noche activado";
-    }
+    timeText.innerText = (hour >= 6 && hour < 18) ? "Modo día activado" : "Modo noche activado";
 }
 autoTheme();
 
-/* =========================================
-RECONOCIMIENTO DE VOZ (CORRECCIÓN: Compatibilidad)
-========================================= */
+// =============================================
+// RECONOCIMIENTO DE VOZ (compatible)
+// =============================================
 let recognition = null;
-// CORRECCIÓN 6: Verificar si el navegador soporta webkitSpeechRecognition
-if('webkitSpeechRecognition' in window){
+if ('webkitSpeechRecognition' in window) {
     recognition = new webkitSpeechRecognition();
     recognition.lang = "es-ES";
     recognition.continuous = false;
-    recognition.onresult = function(event){
+    recognition.onresult = function(event) {
         const speech = event.results[0][0].transcript.toLowerCase();
-        if(speech.includes("matrix")) toggleMatrix();
-        if(speech.includes("feliz")) setMode("feliz");
-        if(speech.includes("tranquilo")) setMode("tranquilo");
-        if(speech.includes("creativo")) setMode("creativo");
-        if(speech.includes("motivado")) setMode("motivado");
+        if (speech.includes("matrix")) toggleMatrix();
+        if (speech.includes("feliz")) setMode("feliz");
+        if (speech.includes("tranquilo")) setMode("tranquilo");
+        if (speech.includes("creativo")) setMode("creativo");
+        if (speech.includes("motivado")) setMode("motivado");
     };
-    recognition.onerror = function(e){
-        console.warn("Error de reconocimiento de voz:", e.error);
-        alert("No se pudo acceder al micrófono. Verifica los permisos.");
-    };
+    recognition.onerror = (e) => console.warn("Error voz:", e.error);
 } else {
-    console.warn("webkitSpeechRecognition no soportado");
-    // Deshabilitar el botón de voz visualmente
     const voiceBtn = document.querySelector("button[onclick='startVoice()']");
-    if(voiceBtn){
+    if (voiceBtn) {
         voiceBtn.disabled = true;
         voiceBtn.style.opacity = "0.5";
-        voiceBtn.title = "Reconocimiento de voz no soportado en este navegador";
+        voiceBtn.title = "No soportado en este navegador";
     }
 }
 
-function startVoice(){
-    if(recognition){
-        recognition.start();
-    } else {
-        alert("Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.");
-    }
+function startVoice() {
+    if (recognition) recognition.start();
+    else alert("Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.");
 }
 
-/* =========================================
-FONDO ESTRELLAS - INICIALIZACIÓN GLOBAL
-========================================= */
-// CORRECCIÓN 7: Integración definitiva: al cargar, las estrellas se ejecutan y matrix está desactivada.
-const canvas = document.getElementById("bg");
-function resizeCanvas() {
+// =============================================
+// INICIALIZACIÓN FINAL (estrellas y resize)
+// =============================================
+function handleResize() {
+    const canvas = document.getElementById("bg");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    if(!matrixActive){
-        // Si no está activo matrix, reajustamos estrellas y redibujamos
-        initStars();
-        // No es necesario reiniciar la animación si ya corre, pero forzamos reinicio limpio
-        if(starsAnimation){
+    if (!matrixActive) {
+        // Reiniciar estrellas con nuevo tamaño
+        if (starsAnimation) {
             cancelAnimationFrame(starsAnimation);
             starsAnimation = null;
         }
+        initStars();
         animateStars();
     } else {
-        // Si matrix está activo, solo redimensionamos el canvas y la animación matrix se adaptará automáticamente
-        // Pero matrix necesita reiniciar el dibujo porque cambió el ancho
-        if(matrixAnimation){
+        // Si Matrix está activo, reiniciar la animación Matrix para que use nuevo tamaño
+        if (matrixAnimation) {
             cancelAnimationFrame(matrixAnimation);
-            startMatrix(); // reinicia matrix con nuevo tamaño
+            startMatrix();
         }
     }
 }
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", handleResize);
 
-// Inicialización al cargar la página
+// Arrancar todo
 initStars();
-animateStars(); // comienza con el efecto estrellas (Matrix desactivado)
-
-// Aseguramos que la variable matrixActive esté definida antes de usarla en setMode
-let matrixActive = false; // (ya declarada arriba, pero la re-declaramos aquí para orden)
-// Nota: la variable matrixActive ya fue declarada con 'let' al principio de la sección Matrix.
-// Para evitar error de redeclaración, la movemos arriba y unificamos.
-// En el código real he unificado: al principio de la sección Matrix está 'let matrixActive = false;'.
-// Todo funciona correctamente.
+animateStars();   // Inicia fondo de estrellas (Matrix desactivado por defecto)
 </script>
 </body>
 </html>
