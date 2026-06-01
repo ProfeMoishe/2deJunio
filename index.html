@@ -2,12 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>AURA - Experiencia Inteligente</title>
 <style>
-/* =========================================
-RESET Y ESTILOS BASE
-========================================= */
+/* RESET */
 * {
     margin: 0;
     padding: 0;
@@ -15,28 +13,37 @@ RESET Y ESTILOS BASE
     font-family: Arial, sans-serif;
 }
 
+/* CORRECCIÓN: Flexbox en body para centrar el contenedor verticalmente */
 html, body {
     height: 100%;
     width: 100%;
 }
 
 body {
-    overflow: hidden;
+    display: flex;
+    align-items: center;      /* Centrado vertical */
+    justify-content: center;  /* Centrado horizontal */
     min-height: 100vh;
     background: linear-gradient(135deg, #020617, #0f172a, #111827);
     color: white;
-    transition: 1s;
+    transition: background 1s;
+    overflow-x: hidden;
+    overflow-y: auto;         /* Permitir scroll si el contenido es muy alto (útil en móvil) */
     position: relative;
 }
 
+/* Canvas de fondo fijo */
 canvas {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     z-index: -1;
+    pointer-events: none;     /* Para que no interfiera con clics */
 }
 
+/* Loader */
 .loader {
     position: fixed;
     inset: 0;
@@ -49,20 +56,14 @@ canvas {
     animation: fadeOut 2s forwards;
     animation-delay: 2s;
 }
-
 @keyframes fadeOut {
-    to {
-        opacity: 0;
-        visibility: hidden;
-    }
+    to { opacity: 0; visibility: hidden; }
 }
 
+/* Contenedor principal: ya no necesita top/transform, el body lo centra */
 .container {
-    position: relative;
     width: min(92%, 950px);
-    margin: auto;
-    top: 50%;
-    transform: translateY(-50%);
+    margin: 20px auto;        /* margen superior e inferior para separación en móvil */
     padding: clamp(20px, 4vw, 40px);
     border-radius: 30px;
     backdrop-filter: blur(15px);
@@ -70,6 +71,7 @@ canvas {
     border: 1px solid rgba(255,255,255,0.15);
     box-shadow: 0 0 40px rgba(255,255,255,0.08);
     text-align: center;
+    /* El contenedor se adapta al contenido, y el body lo centra */
 }
 
 h1 { font-size: clamp(2.5rem, 7vw, 5rem); margin-bottom: 15px; }
@@ -92,8 +94,8 @@ button {
     font-weight: bold;
     transition: 0.3s;
 }
-button:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(56,189,248,0.5); }
-button:active { transform: scale(0.97); }
+button:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(56,189,248,0.5); }
+button:active { transform: scale(0.98); }
 
 .mode-buttons {
     display: grid;
@@ -141,6 +143,7 @@ button:active { transform: scale(0.97); }
     font-weight: bold;
 }
 
+/* Modos especiales */
 .cyberpunk {
     background: black !important;
     color: #00ffee;
@@ -159,15 +162,28 @@ button:active { transform: scale(0.97); }
     box-shadow: 0 0 35px #00ff88;
 }
 
-@media(max-width: 900px) { .container { width: 94%; } }
-@media(max-width: 600px) {
-    body { overflow: auto; }
-    .container { top: auto; transform: none; margin: 40px auto; border-radius: 22px; padding: 20px; }
-    .mode-buttons { grid-template-columns: 1fr; }
-    .stats { grid-template-columns: 1fr; }
-    input, button { padding: 16px; font-size: 1rem; }
-}
-@media(max-width: 380px) {
+/* Responsive: en móvil el contenedor ocupa más ancho y se separa del borde */
+@media (max-width: 600px) {
+    body {
+        align-items: flex-start; /* permite que el contenido se desplace desde arriba */
+        padding: 20px 0;
+    }
+    .container {
+        width: 90%;
+        margin: 0 auto;
+        border-radius: 22px;
+        padding: 20px;
+    }
+    .mode-buttons {
+        grid-template-columns: 1fr;
+    }
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    input, button {
+        padding: 16px;
+        font-size: 1rem;
+    }
     h1 { font-size: 2rem; }
     p { font-size: 0.9rem; }
 }
@@ -217,12 +233,12 @@ button:active { transform: scale(0.97); }
 
 <script>
 // =============================================
-// VARIABLES GLOBALES (declaradas una sola vez)
+// VARIABLES GLOBALES
 // =============================================
-let matrixActive = false;     // Controla el modo Matrix
-let matrixAnimation = null;   // ID de requestAnimationFrame del Matrix
-let starsAnimation = null;    // ID de la animación de estrellas
-let stars = [];               // Array de estrellas
+let matrixActive = false;
+let matrixAnimation = null;
+let starsAnimation = null;
+let stars = [];
 let clicks = 0;
 let moves = 0;
 let seconds = 0;
@@ -252,15 +268,12 @@ function saveData() {
 }
 
 // =============================================
-// MODOS EMOCIONALES (con corrección: si Matrix está activo, lo desactiva)
+// MODOS EMOCIONALES
 // =============================================
 function setMode(mode) {
     const body = document.body;
     body.classList.remove("cyberpunk");
-    // Si el modo Matrix está activo, lo desactivamos para que se vea el color
-    if (matrixActive) {
-        toggleMatrix();  // esto desactiva Matrix y reinicia las estrellas
-    }
+    if (matrixActive) toggleMatrix();  // Desactiva Matrix para que se vea el color
     switch (mode) {
         case "feliz": body.style.background = "linear-gradient(135deg,#f59e0b,#facc15)"; break;
         case "tranquilo": body.style.background = "linear-gradient(135deg,#0ea5e9,#1e3a8a)"; break;
@@ -271,7 +284,7 @@ function setMode(mode) {
 }
 
 // =============================================
-// PARTÍCULAS AL MOVER EL MOUSE
+// PARTÍCULAS
 // =============================================
 document.addEventListener("mousemove", (e) => {
     const particle = document.createElement("div");
@@ -284,14 +297,13 @@ document.addEventListener("mousemove", (e) => {
 });
 
 // =============================================
-// MODO OCULTO (CYBERPUNK) - Teclado "aura"
+// MODO OCULTO (CYBERPUNK)
 // =============================================
 let secret = [];
 let secretTimeout;
-
 document.addEventListener("keydown", (e) => {
     secret.push(e.key);
-    if (secret.length > 10) secret.shift(); // Limitar tamaño
+    if (secret.length > 10) secret.shift();
     clearTimeout(secretTimeout);
     secretTimeout = setTimeout(() => { secret = []; }, 3000);
     if (secret.join("").includes("aura")) {
@@ -300,14 +312,13 @@ document.addEventListener("keydown", (e) => {
         clearTimeout(secretTimeout);
     }
 });
-
 function activateCyberpunk() {
     document.body.classList.add("cyberpunk");
     alert("Modo oculto activado");
 }
 
 // =============================================
-// IA AURA (texto y voz)
+// IA AURA (VOZ)
 // =============================================
 const auraMessages = [
     "Detecto creatividad en tu mente.",
@@ -317,7 +328,6 @@ const auraMessages = [
     "Modo futurista sincronizado.",
     "Tu presencia altera el entorno."
 ];
-
 function speakAura() {
     const randomMessage = auraMessages[Math.floor(Math.random() * auraMessages.length)];
     document.getElementById("aiMessage").innerText = randomMessage;
@@ -327,7 +337,7 @@ function speakAura() {
 }
 
 // =============================================
-// FONDO DE ESTRELLAS (normal)
+// FONDO ESTRELLAS
 // =============================================
 function initStars() {
     const canvas = document.getElementById("bg");
@@ -366,7 +376,7 @@ function animateStars() {
 }
 
 // =============================================
-// MODO MATRIX (con gestión limpia de animaciones)
+// MODO MATRIX
 // =============================================
 function startMatrix() {
     const canvas = document.getElementById("bg");
@@ -409,7 +419,6 @@ function toggleMatrix() {
     matrixActive = !matrixActive;
     document.body.classList.toggle("matrix-mode");
     if (matrixActive) {
-        // Detener estrellas
         if (starsAnimation) {
             cancelAnimationFrame(starsAnimation);
             starsAnimation = null;
@@ -417,23 +426,21 @@ function toggleMatrix() {
         startMatrix();
     } else {
         stopMatrix();
-        // Limpiar canvas y reiniciar estrellas
         const canvas = document.getElementById("bg");
         const ctx = canvas.getContext("2d");
         if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-        initStars();          // reinicia posición de estrellas con el tamaño actual
-        animateStars();       // arranca de nuevo la animación de estrellas
+        initStars();
+        animateStars();
     }
 }
 
 // =============================================
-// ESTADÍSTICAS (con throttling de movimientos)
+// ESTADÍSTICAS
 // =============================================
 document.addEventListener("click", () => {
     clicks++;
     document.getElementById("clickCount").innerText = clicks;
 });
-
 document.addEventListener("mousemove", () => {
     const now = Date.now();
     if (now - lastMoveTime >= MOVE_THROTTLE_MS) {
@@ -442,14 +449,13 @@ document.addEventListener("mousemove", () => {
         lastMoveTime = now;
     }
 });
-
 setInterval(() => {
     seconds++;
     document.getElementById("timeCount").innerText = seconds;
 }, 1000);
 
 // =============================================
-// DÍA / NOCHE AUTOMÁTICO
+// DÍA/NOCHE
 // =============================================
 function autoTheme() {
     const hour = new Date().getHours();
@@ -459,7 +465,7 @@ function autoTheme() {
 autoTheme();
 
 // =============================================
-// RECONOCIMIENTO DE VOZ (compatible)
+// RECONOCIMIENTO DE VOZ
 // =============================================
 let recognition = null;
 if ('webkitSpeechRecognition' in window) {
@@ -483,21 +489,19 @@ if ('webkitSpeechRecognition' in window) {
         voiceBtn.title = "No soportado en este navegador";
     }
 }
-
 function startVoice() {
     if (recognition) recognition.start();
     else alert("Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.");
 }
 
 // =============================================
-// INICIALIZACIÓN FINAL (estrellas y resize)
+// AJUSTE DE RESIZE
 // =============================================
 function handleResize() {
     const canvas = document.getElementById("bg");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     if (!matrixActive) {
-        // Reiniciar estrellas con nuevo tamaño
         if (starsAnimation) {
             cancelAnimationFrame(starsAnimation);
             starsAnimation = null;
@@ -505,19 +509,19 @@ function handleResize() {
         initStars();
         animateStars();
     } else {
-        // Si Matrix está activo, reiniciar la animación Matrix para que use nuevo tamaño
         if (matrixAnimation) {
             cancelAnimationFrame(matrixAnimation);
             startMatrix();
         }
     }
 }
-
 window.addEventListener("resize", handleResize);
 
-// Arrancar todo
+// =============================================
+// INICIALIZACIÓN
+// =============================================
 initStars();
-animateStars();   // Inicia fondo de estrellas (Matrix desactivado por defecto)
+animateStars();
 </script>
 </body>
 </html>
