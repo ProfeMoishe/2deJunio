@@ -23,6 +23,9 @@ body {
     display: flex;
     align-items: center;      /* Centrado vertical */
     justify-content: center;  /* Centrado horizontal */
+        flex-direction: column;
+    align-items: center;      /* Centrado horizontal */
+    justify-content: flex-start;  /* Contenido desde el top */
     min-height: 100vh;
     background: linear-gradient(135deg, #020617, #0f172a, #111827);
     color: white;
@@ -30,6 +33,7 @@ body {
     overflow-x: hidden;
     overflow-y: auto;         /* Permitir scroll si el contenido es muy alto (útil en móvil) */
     position: relative;
+    padding: 20px 0;
 }
 
 /* Canvas de fondo fijo */
